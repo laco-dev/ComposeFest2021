@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             LayoutsCodelabTheme {
-                LayoutsCodelab()
+                TwoTexts(text1 = "Hello", text2 =  "World")
             }
         }
     }
