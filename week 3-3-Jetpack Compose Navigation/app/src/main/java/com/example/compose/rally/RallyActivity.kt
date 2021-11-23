@@ -23,12 +23,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.compose.rally.data.UserData
 import com.example.compose.rally.ui.accounts.AccountsBody
+import com.example.compose.rally.ui.accounts.SingleAccountBody
 import com.example.compose.rally.ui.bills.BillsBody
 import com.example.compose.rally.ui.components.RallyTabRow
 import com.example.compose.rally.ui.overview.OverviewBody
@@ -71,11 +75,26 @@ fun RallyApp() {
                 modifier = Modifier.padding(innerPadding)
             ) {
                 composable(RallyScreen.Overview.name) {
-                    OverviewBody()
+                    OverviewBody(
+                        onAccountClick = { name ->
+                            navigateToSingleAccount(navController, name)
+                        }
+                    )
                 }
+
+                val accountsName = RallyScreen.Accounts.name
                 composable(RallyScreen.Accounts.name) {
                     AccountsBody(accounts = UserData.accounts)
                 }
+                composable(
+                    route = "$accountsName/{name}",
+                    arguments = listOf(navArgument("name") { type = NavType.StringType })
+                ) { entry ->
+                    val accountName = entry.arguments?.getString("name")
+                    val account = UserData.getAccount(accountName)
+                    SingleAccountBody(account = account)
+                }
+
                 composable(RallyScreen.Bills.name) {
                     BillsBody(bills = UserData.bills)
                 }
@@ -83,3 +102,12 @@ fun RallyApp() {
         }
     }
 }
+
+
+private fun navigateToSingleAccount(
+    navController: NavHostController,
+    accountName: String
+) {
+    navController.navigate("${RallyScreen.Accounts.name}/$accountName")
+}
+
